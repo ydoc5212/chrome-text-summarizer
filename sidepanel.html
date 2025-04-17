@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Text Summary</title>
+        <link rel="stylesheet" href="sidepanel.css" />
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <div id="prompt-container">
+            <h3>Prompt</h3>
+            <textarea id="prompt-input" rows="4" style="width: 95%"></textarea>
+            <p id="save-status" style="font-size: 0.8em; margin-top: 5px"></p>
+        </div>
+        <hr />
+        <div class="container">
+            <h2>Summary</h2>
+            <div id="summary-container">
+                <p id="loading-indicator">Loading summary...</p>
+                <p id="summary-content" class="hidden"></p>
+                <p id="error-message" class="hidden error"></p>
+            </div>
+
+            <hr />
+
+            <h3>Original Text</h3>
+            <div id="original-text-container">
+                <p id="original-text">
+                    (Select text on a page and right-click to summarize)
+                </p>
+            </div>
+        </div>
+        <script src="sidepanel.js"></script>
+    </body>
+</html>

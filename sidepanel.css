@@ -1,0 +1,102 @@
+body {
+    font-family: sans-serif;
+    /* width: 350px; Remove fixed width for side panel */
+    padding: 15px;
+    height: 100vh; /* Try to fill height */
+    box-sizing: border-box;
+    font-size: 15px; /* Increase base font size slightly */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Allow container to fill height */
+}
+
+h2,
+h3 {
+    margin-top: 5px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+#prompt-container,
+#summary-container,
+#original-text-container {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    overflow-y: auto; /* Keep vertical scroll */
+}
+
+/* Style the textarea inside the prompt container */
+#prompt-container textarea {
+    border: none; /* Remove default border */
+    outline: none; /* Remove focus outline */
+    resize: vertical; /* Allow vertical resize only */
+    background-color: transparent; /* Match container background */
+    padding: 5px; /* Add some internal padding */
+    margin-top: 5px; /* Space below heading */
+    width: calc(100% - 10px); /* Adjust width considering padding */
+    box-sizing: border-box;
+}
+
+/* Make containers flexible */
+#summary-container {
+    flex-grow: 1; /* Let summary take more space */
+    min-height: 100px; /* Minimum height */
+}
+
+#original-text-container {
+    flex-shrink: 0; /* Prevent original text from shrinking too much */
+    max-height: 40%; /* Limit original text height */
+}
+
+#loading-indicator {
+    color: #888;
+    font-style: italic;
+}
+
+.hidden {
+    display: none;
+}
+
+.error {
+    color: #d8000c; /* Red color for errors */
+    background-color: #ffd2d2; /* Light red background */
+    border: 1px solid #d8000c;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+#original-text {
+    color: #555;
+    font-size: 0.9em;
+    word-wrap: break-word; /* Wrap long words */
+}
+
+#summary-content {
+    word-wrap: break-word; /* Ensure summary text wraps */
+    font-size: 1.1em; /* Make summary text larger relative to base */
+    line-height: 1.5; /* Increase line spacing for readability */
+}
+
+/* Adjust list styling slightly */
+#summary-content ul {
+    padding-left: 20px; /* Standard indentation for lists */
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#summary-content li {
+    margin-bottom: 0.5em; /* Add some space between bullet points */
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 15px 0;
+}
