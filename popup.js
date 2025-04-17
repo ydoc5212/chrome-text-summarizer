@@ -105,4 +105,50 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
     });
+
+    const apiKeyInput = document.getElementById("popup-api-key");
+    const saveButton = document.getElementById("popup-save-key");
+    const statusDiv = document.getElementById("popup-status");
+
+    // Function to save the API key (using local storage)
+    function saveApiKey() {
+        const apiKey = apiKeyInput.value.trim();
+        if (apiKey) {
+            chrome.storage.local.set({ geminiApiKey: apiKey }, () => {
+                statusDiv.textContent = "API Key saved.";
+                statusDiv.style.color = "green";
+                console.log("API Key saved via popup.");
+                setTimeout(() => {
+                    statusDiv.textContent = "";
+                }, 2000); // Clear message after 2 seconds
+            });
+        } else {
+            statusDiv.textContent = "Please enter an API Key.";
+            statusDiv.style.color = "red";
+            setTimeout(() => {
+                statusDiv.textContent = "";
+            }, 2000);
+        }
+    }
+
+    // Function to restore the saved API key when the popup loads
+    function restoreApiKey() {
+        // Use default value of null to distinguish between unset and empty string
+        chrome.storage.local.get({ geminiApiKey: null }, (result) => {
+            if (result.geminiApiKey) {
+                apiKeyInput.value = result.geminiApiKey;
+                console.log("Loaded API key into popup.");
+            } else {
+                console.log("No API key found in storage (popup).");
+                // Optional: Set placeholder or leave empty
+                apiKeyInput.placeholder = "Enter API key here";
+            }
+        });
+    }
+
+    // Add event listeners
+    saveButton.addEventListener("click", saveApiKey);
+
+    // Load existing options when the page loads
+    restoreApiKey();
 });

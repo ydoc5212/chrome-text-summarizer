@@ -15,10 +15,48 @@
     </head>
     <body>
         <h3>AI Text Summarizer</h3>
-        <p style="font-size: 0.9em">
-            Settings available via <br />
+
+        <div
+            style="
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+            "
+        >
+            <label
+                for="popup-api-key"
+                style="display: block; margin-bottom: 5px; font-size: 0.9em"
+                >Gemini API Key:</label
+            >
+            <input
+                type="password"
+                id="popup-api-key"
+                placeholder="Enter API key"
+                style="
+                    width: 90%;
+                    padding: 5px;
+                    margin-bottom: 8px;
+                    font-size: 0.9em;
+                "
+            />
+            <button
+                id="popup-save-key"
+                style="padding: 5px 10px; font-size: 0.9em"
+            >
+                Save Key
+            </button>
+            <div
+                id="popup-status"
+                style="font-size: 0.8em; margin-top: 8px"
+            ></div>
+        </div>
+
+        <!-- <p style="font-size: 0.9em;">
+            Settings available via <br/>
             Extension Options.
-        </p>
+        </p> -->
         <!-- No script needed for this simple version -->
+        <script src="popup.js"></script>
+        <!-- Re-add script link -->
     </body>
 </html>
