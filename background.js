@@ -127,7 +127,7 @@ chrome.runtime.onInstalled.addListener(() => {
         // Always attempt to create the new context menu item
         chrome.contextMenus.create({
             id: "summarizeSelection",
-            title: "AI Text Summarizer: Summarize Selection", // Changed title
+            title: "AI Text Summarizer", // Simplified title
             contexts: ["selection"],
         });
         console.log("Context menu created/updated.");
