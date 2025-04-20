@@ -140,64 +140,166 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         const selectedText = info.selectionText;
         console.log("Selected Text:", selectedText);
 
-        // Ensure side panel is available before attempting to open
-        if (tab && tab.id) {
-            try {
-                await chrome.sidePanel.open({ tabId: tab.id });
-                console.log("Side panel opened for tab:", tab.id);
-            } catch (error) {
-                console.error("Error opening side panel:", error);
-                // Fallback or alternative action could be added here if needed
-            }
+        // Determine target for side panel
+        let openConfig = null;
+        if (tab && tab.id && tab.id !== -1) {
+            openConfig = { tabId: tab.id };
+            console.log(`Attempting to open side panel for tabId: ${tab.id}`);
+        } else if (tab && tab.windowId) {
+            openConfig = { windowId: tab.windowId };
+            console.warn(
+                `tabId invalid (${tab.id}), attempting to open side panel for windowId: ${tab.windowId}`
+            );
         } else {
             console.error(
-                "Cannot open side panel, tab information is missing."
+                "Cannot open side panel, valid tab or window information is missing."
             );
+            // Optional: Maybe notify the user via a different method if panel cannot open?
             return; // Exit if we can't open the panel
         }
 
-        // Store selected text and indicate loading state
-        chrome.storage.local.set(
-            {
-                selectedText: selectedText,
-                summaryText: "Summarizing...",
-                isLoading: true,
-                error: null,
-            },
-            () => {
-                console.log("Selected text stored, starting summarization.");
-                // Call the API function
-                summarizeTextWithGemini(selectedText)
-                    .then((summary) => {
-                        console.log("Summary Received:", summary);
-                        // Store the result
-                        chrome.storage.local.set(
-                            {
-                                summaryText: summary,
-                                isLoading: false,
-                            },
-                            () => {
-                                console.log("Summary stored.");
-                                // Side panel should already be open
-                            }
-                        );
-                    })
-                    .catch((error) => {
-                        console.error("Summarization failed:", error);
-                        chrome.storage.local.set(
-                            {
-                                summaryText: "Failed to summarize.",
-                                isLoading: false,
-                                error:
-                                    error.message ||
-                                    "An unknown error occurred.",
-                            },
-                            () => {
-                                console.log("Error state stored.");
-                            }
-                        );
-                    });
+        // Helper function to open summary in a new tab
+        function openSummaryInNewTab(original, summary, error) {
+            const url = new URL(chrome.runtime.getURL("summary_display.html"));
+            url.searchParams.set(
+                "original",
+                encodeURIComponent(original || "")
+            );
+            if (error) {
+                url.searchParams.set("error", encodeURIComponent(error));
+            } else {
+                url.searchParams.set(
+                    "summary",
+                    encodeURIComponent(summary || "")
+                );
             }
-        );
+
+            chrome.tabs.create({ url: url.toString() });
+
+            // Clear storage *after* opening tab to avoid race conditions
+            // and ensure the normal side panel doesn't pick this up.
+            chrome.storage.local.remove([
+                "selectedText",
+                "summaryText",
+                "isLoading",
+                "error",
+            ]);
+        }
+
+        // Try opening the side panel with the determined config
+        let sidePanelOpened = false;
+        try {
+            await chrome.sidePanel.open(openConfig);
+            console.log(
+                "Side panel open call succeeded with config:",
+                openConfig
+            );
+            sidePanelOpened = true;
+        } catch (error) {
+            // Error is expected in PDF context, log it but proceed to fallback
+            console.warn(
+                // Use warn instead of error for expected failures
+                "Failed to open side panel (expected for PDF/special pages):",
+                openConfig,
+                error,
+                "\nProceeding with new tab fallback."
+            );
+            // sidePanelOpened remains false
+        }
+
+        if (sidePanelOpened) {
+            // Side panel opened, store data for it to pick up
+            chrome.storage.local.set(
+                {
+                    selectedText: selectedText,
+                    summaryText: "Summarizing...",
+                    isLoading: true,
+                    error: null,
+                },
+                () => {
+                    console.log(
+                        "Selected text stored for side panel, starting summarization."
+                    );
+                    // Call the API function
+                    summarizeTextWithGemini(selectedText)
+                        .then((summary) => {
+                            console.log("Summary Received:", summary);
+                            // Store the result for side panel
+                            chrome.storage.local.set(
+                                {
+                                    summaryText: summary,
+                                    isLoading: false,
+                                },
+                                () => {
+                                    console.log(
+                                        "Summary stored for side panel."
+                                    );
+                                }
+                            );
+                        })
+                        .catch((error) => {
+                            console.error("Summarization failed:", error);
+                            chrome.storage.local.set(
+                                {
+                                    summaryText: "Failed to summarize.",
+                                    isLoading: false,
+                                    error:
+                                        error.message ||
+                                        "An unknown error occurred.",
+                                },
+                                () => {
+                                    console.log(
+                                        "Error state stored for side panel."
+                                    );
+                                }
+                            );
+                        });
+                }
+            );
+        } else {
+            // Side panel failed to open, likely PDF context.
+            // Open new tab immediately with original text, it will request summary.
+            console.log("[Fallback] Opening new tab for summary display.");
+            const url = new URL(chrome.runtime.getURL("summary_display.html"));
+            url.searchParams.set(
+                "original",
+                encodeURIComponent(selectedText || "")
+            );
+            chrome.tabs.create({ url: url.toString() });
+            // Do NOT store data in local storage for the fallback case
+        }
     }
+});
+
+// Listener for messages from content scripts or other extension pages
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "getSummary" && request.textToSummarize) {
+        console.log(
+            "[Background] Received getSummary request from",
+            sender.tab ? "tab " + sender.tab.id : "extension page"
+        );
+        summarizeTextWithGemini(request.textToSummarize)
+            .then((summaryResult) => {
+                console.log(
+                    "[Background] Sending summary result back:",
+                    summaryResult
+                );
+                sendResponse({ result: summaryResult });
+            })
+            .catch((error) => {
+                // Catch unexpected errors during the API call itself
+                console.error(
+                    "[Background] Error during summarizeTextWithGemini for getSummary request:",
+                    error
+                );
+                sendResponse({
+                    error: `Background summarization failed: ${
+                        error.message || "Unknown error"
+                    }`,
+                });
+            });
+        return true; // Indicates that the response is sent asynchronously
+    }
+    // Handle other message types if needed
+    return false; // No async response planned for other types
 });

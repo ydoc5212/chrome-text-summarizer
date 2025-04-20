@@ -16,6 +16,35 @@
     <body>
         <h3>AI Text Summarizer</h3>
 
+        <!-- Prompt Customization Section -->
+        <div style="margin-bottom: 15px">
+            <label
+                for="prompt-input"
+                style="display: block; margin-bottom: 5px; font-size: 0.9em"
+                >Custom Prompt:</label
+            >
+            <textarea
+                id="prompt-input"
+                rows="3"
+                style="
+                    width: 90%;
+                    padding: 5px;
+                    margin-bottom: 8px;
+                    font-size: 0.9em;
+                "
+            ></textarea>
+            <button
+                id="save-prompt-button"
+                style="padding: 5px 10px; font-size: 0.9em"
+            >
+                Save Prompt
+            </button>
+            <div
+                id="save-status"
+                style="font-size: 0.8em; margin-top: 8px; color: green"
+            ></div>
+        </div>
+
         <div
             style="
                 margin-top: 15px;
@@ -49,6 +78,59 @@
                 id="popup-status"
                 style="font-size: 0.8em; margin-top: 8px"
             ></div>
+        </div>
+
+        <!-- Summary Display Section -->
+        <div
+            style="
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+            "
+        >
+            <h4>Summary</h4>
+            <div id="loading-indicator">Loading summary...</div>
+            <div id="error-message" class="hidden" style="color: red"></div>
+            <div
+                id="summary-content"
+                class="hidden"
+                style="
+                    text-align: left;
+                    white-space: pre-wrap;
+                    max-height: 150px;
+                    overflow-y: auto;
+                    background-color: #f9f9f9;
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    margin-top: 5px;
+                "
+            ></div>
+        </div>
+
+        <!-- Original Text Display Section -->
+        <div
+            style="
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+            "
+        >
+            <h4>Original Text</h4>
+            <div
+                id="original-text"
+                style="
+                    text-align: left;
+                    white-space: pre-wrap;
+                    max-height: 150px;
+                    overflow-y: auto;
+                    background-color: #f9f9f9;
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    margin-top: 5px;
+                "
+            >
+                (Select text on a page and use the context menu to summarize)
+            </div>
         </div>
 
         <!-- <p style="font-size: 0.9em;">

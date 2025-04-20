@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Summary Result</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 15px;
+            }
+            h3 {
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 5px;
+                margin-top: 20px;
+            }
+            #original-text-content,
+            #summary-content {
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin-top: 5px;
+                white-space: pre-wrap; /* Preserve line breaks */
+                word-wrap: break-word; /* Wrap long words */
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            .error {
+                color: red;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>AI Text Summarizer Result</h1>
+
+        <h3>Original Text</h3>
+        <div id="original-text-content">(Loading original text...)</div>
+
+        <h3>Prompt</h3>
+        <textarea
+            id="prompt-input"
+            rows="4"
+            style="width: 95%; margin-bottom: 5px"
+        ></textarea>
+        <button id="summarize-button">Summarize with this Prompt</button>
+        <div
+            id="prompt-save-status"
+            style="font-size: 0.8em; color: green; margin-top: 5px; height: 1em"
+        ></div>
+
+        <h3>Summary</h3>
+        <div id="summary-content">(Loading summary...)</div>
+
+        <script src="summary_display.js"></script>
+    </body>
+</html>
