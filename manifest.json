@@ -3,8 +3,10 @@
     "name": "AI Text Summarizer",
     "version": "1.0",
     "description": "Right-click selected text to summarize it using Gemini.",
-    "permissions": ["contextMenus", "storage", "activeTab", "sidePanel"],
-    "host_permissions": ["https://generativelanguage.googleapis.com/*"],
+    "permissions": ["contextMenus", "storage", "sidePanel"],
+    "host_permissions": [
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent"
+    ],
     "background": {
         "service_worker": "background.js"
     },
